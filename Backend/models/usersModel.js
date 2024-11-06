@@ -28,6 +28,8 @@ const userSchema = new Schema({
             },
         },
         toObject: {
+            virtuals: true,
+            versionKey: false,
             transform: (doc, ret) => {
                 delete ret.password; // Exclude password
                 return ret;

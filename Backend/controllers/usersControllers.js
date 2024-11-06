@@ -1,6 +1,7 @@
 import User from '../models/usersModel.js';
 import { CustomError } from '../utils/errorHandler.js';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 // Get all users
 export const getUsers = async (req, res, next) => {
@@ -28,7 +29,7 @@ export const getUserById = async (req, res, next) => {
   // Create a new user
 export const createUser = async (req, res, next) => {
     try {
-      const { name, email, password, role, image } = req.body;
+      const { username, password, exp, matchesPlayed } = req.body;
   
       // Hash the password before saving
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -87,4 +88,59 @@ export const deleteUser = async (req, res, next) => {
     } catch (error) {
       next(new CustomError(error.message || 'Failed to delete user', 400));
     }
+  };
+
+  export const loginUser = async (req, res, next) => {
+    try {
+      const { username, password } = req.body;
+      const user = await User.findOne({ username });
+  
+      if (!user) {
+        throw new CustomError('Invalid username or password', 401);
+      }
+  
+      const isMatch = await bcrypt.compare(password, user.password);
+      const token = jwt.sign(
+        { id: user._id,
+            username: user.username,
+            exp: user.exp,
+            matchesPlayed: user.matchesPlayed,
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: process.env.JWT_EXPIRES_IN }
+      );
+
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production', // Set to true in production
+        maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    });
+      
+      if (!isMatch) {
+        throw new CustomError('Invalid username or password', 401);
+      }
+  
+      req.session.user = {
+        id: user._id,
+    username: user.username,
+    exp: user.exp,
+    matchesPlayed: user.matchesPlayed,
+      };
+      res
+        .status(200)
+        .json({ message: 'Login successful', user: req.session.user });
+    } catch (error) {
+      next(error);
+    }
+  };
+  
+  // User Logout
+  export const logoutUser = (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+        return res.status(500).json({ message: 'Logout failed' });
+      }
+      res.clearCookie('connect.sid'); // assuming you're using `connect.sid` as the session cookie name
+      res.status(200).json({ message: 'Logout successful' });
+    });
   };
