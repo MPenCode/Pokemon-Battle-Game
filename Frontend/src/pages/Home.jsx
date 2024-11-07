@@ -26,10 +26,9 @@ const fetchPokemonById = async (id) => {
 const Home = () => {
   const [pokemonData, setPokemonData] = useState([]);
   const [roster, setRoster] = useState([]);
-  const [loaded, setLoaded] = useState(false); // Track if roster has loaded
+  const [loaded, setLoaded] = useState(false); 
   const navigate = useNavigate();
 
-  // Fetch all Pokémon data and store in localStorage
   useEffect(() => {
     const fetchAndStoreAllPokemon = async () => {
       const storedData = JSON.parse(localStorage.getItem(GOTTA_FETCH_EM_ALL_KEY));
@@ -50,14 +49,12 @@ const Home = () => {
     fetchAndStoreAllPokemon();
   }, []);
 
-  // Load roster from localStorage on initial load
   useEffect(() => {
     const storedRoster = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || [];
     setRoster(storedRoster);
-    setLoaded(true); // Mark as loaded after setting the initial roster
+    setLoaded(true);
   }, []);
 
-  // Update localStorage whenever the roster changes, only if it's loaded
   useEffect(() => {
     if (loaded) {
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(roster));
@@ -94,7 +91,8 @@ const Home = () => {
 
   const handleBattleClick = () => {
     if (roster.length === 6) {
-      generateComputerRoster(); // Generate computer roster before navigating
+      generateComputerRoster(); 
+
       navigate('/battleground');
     }
   };
@@ -103,7 +101,6 @@ const Home = () => {
     <div>
       <div>Nav</div>
       <div className="flex h-screen">
-        {/* Pokémon Grid using gottaFetchEmAll data */}
         <div className="pokeGrid w-[70%] bg-[#2EC5B6] grid grid-cols-4 gap-4 p-4 overflow-y-auto">
           {pokemonData.map(pokemon => {
             const isInRoster = roster.some(p => p.id === pokemon.id);
@@ -130,7 +127,6 @@ const Home = () => {
           })}
         </div>
 
-        {/* Roster section */}
         <div className="roster w-[30%] min-h-screen bg-[#ED1F24] flex flex-col justify-between p-4">
           <h2 className="text-center text-2xl font-semibold mb-4">Roster</h2>
 
