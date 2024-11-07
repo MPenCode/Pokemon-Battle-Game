@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Nav from '../components/Nav';
 
 const POKEMON_API_URL = 'https://pokeapi.co/api/v2/pokemon';
 const LOCAL_STORAGE_KEY = 'roster';
@@ -99,7 +100,7 @@ const Home = () => {
 
   return (
     <div>
-      <div>Nav</div>
+      <Nav/>
       <div className="flex h-screen">
         <div className="pokeGrid w-[70%] bg-[#2EC5B6] grid grid-cols-4 gap-4 p-4 overflow-y-auto">
           {pokemonData.map(pokemon => {

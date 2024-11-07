@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Nav from '../components/Nav';
 
 const LOCAL_STORAGE_KEY = 'roster';
 const COMPUTER_ROSTER_KEY = 'computerRoster';
@@ -134,6 +135,8 @@ const Battle = () => {
   };
 
   return (
+    <>
+    <Nav/>
     <div className="flex h-screen">
       <div className="battleScreen w-[70%] bg-gray-200 p-4 relative flex flex-col items-center justify-center h-1/2">
         <h2 className="scoreCalc absolute top-4 left-4">Your Score: {score}</h2>
@@ -248,6 +251,7 @@ const Battle = () => {
         </div>
       )}
     </div>
+    </>
   );
 };
 
