@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const POKEMON_API_URL = 'https://pokeapi.co/api/v2/pokemon';
 const LOCAL_STORAGE_KEY = 'roster';
+const GOTTA_FETCH_EM_ALL_KEY = 'gottaFetchEmAll';
+const COMPUTER_ROSTER_KEY = 'computerRoster';
 
 const fetchPokemonById = async (id) => {
   const response = await axios.get(`${POKEMON_API_URL}/${id}`);
@@ -12,6 +15,8 @@ const fetchPokemonById = async (id) => {
     id: pokemon.id,
     name: pokemon.name,
     sprite: pokemon.sprites?.front_default,
+    animatedSprite: pokemon.sprites?.versions?.['generation-v']?.['black-white']?.animated?.front_default,
+    animatedBackSprite: pokemon.sprites?.versions?.['generation-v']?.['black-white']?.animated?.back_default,
     attack: pokemon.stats?.find(stat => stat.stat.name === 'attack')?.base_stat,
     defense: pokemon.stats?.find(stat => stat.stat.name === 'defense')?.base_stat,
     speed: pokemon.stats?.find(stat => stat.stat.name === 'speed')?.base_stat,
@@ -21,29 +26,43 @@ const fetchPokemonById = async (id) => {
 const Home = () => {
   const [pokemonData, setPokemonData] = useState([]);
   const [roster, setRoster] = useState([]);
+  const [loaded, setLoaded] = useState(false); // Track if roster has loaded
+  const navigate = useNavigate();
 
+  // Fetch all Pokémon data and store in localStorage
   useEffect(() => {
-    const storedRoster = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || [];
-    setRoster(storedRoster);
-  }, []);
-
-  useEffect(() => {
-    const fetchPokemonData = async () => {
-      try {
-        const pokemonPromises = Array.from({ length: 151 }, (_, i) => fetchPokemonById(i + 1));
-        const fetchedData = await Promise.all(pokemonPromises);
-        setPokemonData(fetchedData);
-      } catch (error) {
-        console.error('Failed to fetch Pokémon data:', error);
+    const fetchAndStoreAllPokemon = async () => {
+      const storedData = JSON.parse(localStorage.getItem(GOTTA_FETCH_EM_ALL_KEY));
+      if (storedData) {
+        setPokemonData(storedData);
+      } else {
+        try {
+          const pokemonPromises = Array.from({ length: 151 }, (_, i) => fetchPokemonById(i + 1));
+          const fetchedData = await Promise.all(pokemonPromises);
+          setPokemonData(fetchedData);
+          localStorage.setItem(GOTTA_FETCH_EM_ALL_KEY, JSON.stringify(fetchedData));
+        } catch (error) {
+          console.error('Failed to fetch Pokémon data:', error);
+        }
       }
     };
 
-    fetchPokemonData();
+    fetchAndStoreAllPokemon();
   }, []);
 
+  // Load roster from localStorage on initial load
   useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(roster));
-  }, [roster]);
+    const storedRoster = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || [];
+    setRoster(storedRoster);
+    setLoaded(true); // Mark as loaded after setting the initial roster
+  }, []);
+
+  // Update localStorage whenever the roster changes, only if it's loaded
+  useEffect(() => {
+    if (loaded) {
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(roster));
+    }
+  }, [roster, loaded]);
 
   const handleAddToRoster = (pokemon) => {
     if (roster.length >= 6 || roster.some(p => p.id === pokemon.id)) {
@@ -57,10 +76,34 @@ const Home = () => {
     setRoster(roster.filter(p => p.id !== pokemonId));
   };
 
+  const generateComputerRoster = () => {
+    const randomRoster = [];
+    const data = JSON.parse(localStorage.getItem(GOTTA_FETCH_EM_ALL_KEY)) || [];
+    const selectedIndices = new Set();
+
+    while (randomRoster.length < 6) {
+      const randomIndex = Math.floor(Math.random() * data.length);
+      if (!selectedIndices.has(randomIndex)) {
+        selectedIndices.add(randomIndex);
+        randomRoster.push(data[randomIndex]);
+      }
+    }
+
+    localStorage.setItem(COMPUTER_ROSTER_KEY, JSON.stringify(randomRoster));
+  };
+
+  const handleBattleClick = () => {
+    if (roster.length === 6) {
+      generateComputerRoster(); // Generate computer roster before navigating
+      navigate('/battleground');
+    }
+  };
+
   return (
     <div>
       <div>Nav</div>
       <div className="flex h-screen">
+        {/* Pokémon Grid using gottaFetchEmAll data */}
         <div className="pokeGrid w-[70%] bg-[#2EC5B6] grid grid-cols-4 gap-4 p-4 overflow-y-auto">
           {pokemonData.map(pokemon => {
             const isInRoster = roster.some(p => p.id === pokemon.id);
@@ -111,6 +154,7 @@ const Home = () => {
           <button
             className={`font-bold py-2 px-4 rounded w-full mt-4 mb-4 ${roster.length < 6 ? 'bg-gray-500 cursor-not-allowed' : 'bg-green-500 text-white'}`}
             disabled={roster.length < 6}
+            onClick={handleBattleClick}
           >
             BATTLE
           </button>
