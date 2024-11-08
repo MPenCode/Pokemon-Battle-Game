@@ -13,14 +13,10 @@ const app = express();
 
 app.use(json());
 app.use(
-  cors({
-    origin: 'http://localhost:5173',
-    credentials: true,
-  })
+  json(),
+  cors(),
+  cookieParser()
 );
-app.use(cookieParser());
-
-app.use('/api/v1/users', usersRouter);
 
 app.get('/', (req, res) => res.json({ message: 'Server is running!' }));
 app.get('*', (req, res) => res.status(404).json({ message: 'Page not found!' }));
