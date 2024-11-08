@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 5000;
 const app = express();
 app.use(
   json(),
-  cors({ origin: process.env.CLIENT_URL, credentials: true }),
+  cors(),
   cookieParser()
 );
 
