@@ -56,15 +56,15 @@ const PokemonDetailPage = () => {
   return (
     <div className="bg-gray-100 min-h-screen">
       <Nav />
-      <div className="flex justify-center py-16">
-        <div className="max-w-4xl w-full bg-white rounded-3xl shadow-xl p-10">
+      <div className="flex justify-center py-16  bg-[#2EC5B6]">
+        <div className="max-w-4xl w-full bg-[#ED1F24] rounded-3xl shadow-xl p-10">
           <div className="flex flex-col lg:flex-row items-center justify-between space-y-2 lg:space-y-0 lg:space-x-2">
             {/* Pokémon Name and Animated Sprite */}
             <div className="flex flex-col items-center">
               <h1 className="text-4xl font-extrabold text-gray-800 mb-4 animate__animated animate__fadeIn animate__delay-0.5s animate__zoomIn">
                 {pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}
               </h1>
-              <div className="w-64 h-64 sm:w-96 sm:h-96 xl:w-128 xl:h-128 overflow-hidden rounded-xl shadow-2xl bg-gray-50 flex justify-center items-center animate__animated animate__fadeIn animate__delay-.2s animate__bounceIn">
+              <div className="w-64 h-64 sm:w-96 sm:h-96 xl:w-128 xl:h-128 overflow-hidden rounded-xl shadow-2xl bg-blue-400 flex justify-center items-center animate__animated animate__fadeIn animate__delay-.2s animate__bounceIn">
                 <img
                   className="object-contain max-w-full max-h-full"
                   src={pokemon.animatedSprite}
