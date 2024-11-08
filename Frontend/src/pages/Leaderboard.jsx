@@ -10,12 +10,12 @@ import Nav from '../components/Nav';
         .then(response => {
           const sortedData = response.data.sort((a, b) => b.exp - a.exp);
           setData(sortedData);
-          console.log(sortedData);
+          // console.log(sortedData);
         })
         .catch(error => {
           console.error('Error fetching leaderboard data:', error);
         });
-        console.log(data)
+        // console.log(data)
     }, []);
 
     return (
