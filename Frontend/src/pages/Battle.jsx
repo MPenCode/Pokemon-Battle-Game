@@ -6,7 +6,7 @@ import Nav from '../components/Nav';
 const LOCAL_STORAGE_KEY = 'roster';
 const COMPUTER_ROSTER_KEY = 'computerRoster';
 const POKEMON_API_URL = 'https://pokeapi.co/api/v2/pokemon';
-const BACKEND_API_URL = 'http://localhost:5001/api/v1/users';
+const BACKEND_API_URL = 'http://localhost:5000/api/v1/users';
 
 const Battle = () => {
   const navigate = useNavigate();
