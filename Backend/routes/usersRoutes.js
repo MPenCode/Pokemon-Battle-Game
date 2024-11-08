@@ -8,6 +8,7 @@ import {
   deleteUser,
   loginUser,
   logoutUser,
+  submitScore,
 } from '../controllers/usersControllers.js';
 
 // import { auth, admin } from '../middlewares/authMiddlewares.js';
@@ -22,5 +23,6 @@ usersRouter.get(`/:id`, getUserById);
 usersRouter.put(`/:id`, updateUser);
 usersRouter.delete(`/:id`, deleteUser);
 usersRouter.post(`/logout`, logoutUser);
+usersRouter.post(`/submit-score`, submitScore);
 
 export default usersRouter;

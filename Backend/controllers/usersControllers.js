@@ -144,3 +144,38 @@ export const deleteUser = async (req, res, next) => {
       res.status(200).json({ message: 'Logout successful' });
     });
   };
+
+  export const submitScore = async (req, res, next) => {
+    const { username, exp } = req.body;
+    console.log("Request body received on server:", req.body); // Confirm received data
+  
+    try {
+      // Check if the user exists
+      let user = await User.findOne({ username });
+      console.log("User found:", user); // Log the found user, if any
+  
+      if (user) {
+        // Update existing user's exp and matchesPlayed
+        user.exp += exp;
+        user.matchesPlayed += 1;
+        await user.save();
+        console.log("User updated successfully:", user);
+        return res.status(200).json({ message: 'Score updated successfully', user });
+      } else {
+        // Create a new user if none found
+        user = new User({
+          username,
+          password: 'defaultpassword',
+          exp: exp || 0, // Provide a default if `exp` is undefined
+          matchesPlayed: 1, // Set an initial value for `matchesPlayed`
+        });
+        await user.save();
+        console.log("New user created successfully:", user);
+        return res.status(201).json({ message: 'New user created and score added', user });
+      }
+    } catch (error) {
+      console.error("Error in submitScore:", error); // Log the error with details
+      next(new CustomError('Error submitting score', 500));
+    }
+  };
+  
